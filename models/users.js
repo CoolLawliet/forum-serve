@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 
 let UserSchema = new mongoose.Schema({
     name: String,
-    emil: String,
+    email: String,
     sex: String,
     label: String,
     tips: String,
@@ -25,6 +25,7 @@ let UserSchema = new mongoose.Schema({
             return bcrypt.hashSync(val,12);
         }
     },
+    date: String,
     message: Array
 });
 

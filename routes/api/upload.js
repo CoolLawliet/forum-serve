@@ -5,6 +5,8 @@ var router = express.Router();
 const postParams = require('./../../utils/postParams')
 const {mySend, myError} = require('./../../utils/send')
 const {userModel} = require('../../models/users')
+const {ak,sk,bucket} =require('./upload.config')
+const qiniu = require('qiniu');
 
 
 
@@ -20,6 +22,19 @@ router.post('/',  function (req, res, next) {
         mySend(res, {msg: '修改成功'})
     });
 });
+
+router.get('/uploadToken',(req,res)=>{
+    const mac = new qiniu.auth.digest.Mac(ak, sk);
+    const options = {
+        scope: bucket,
+    };
+    const putPolicy = new qiniu.rs.PutPolicy(options);
+    const token = putPolicy.uploadToken(mac);
+    res.json({
+        code:200,
+        data:token
+    })
+})
 module.exports = router
 
 

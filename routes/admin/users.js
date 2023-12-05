@@ -178,8 +178,7 @@ router.get(
 );
 
 //删除管理员
-router.post(
-    '/deleteUser',
+router.post('/deleteUser',
     passport.authenticate('jwt', { session: false }),
     (req, res) => {
         const params = req.app.get('params');
@@ -192,8 +191,7 @@ router.post(
                mySend(res, {msg: '删除用户成功',status:200})
            }
        })
-    }
-);
+    });
 
 //返回修改密码成功
 router.post(

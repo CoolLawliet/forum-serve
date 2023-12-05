@@ -14,8 +14,8 @@ require('dotenv').config();
 // 获取用户信息
 router.get('/userInfo',  (req, res) => {
     const params = req.query;
-    if (params.token) {
-        jwt.verify(params.token, req.app.get('secret'), (err, decode) => {
+    if (req.headers.token.token) {
+        jwt.verify(req.headers.token, req.app.get('secret'), (err, decode) => {
             if (err) {
                 mySend(res, {msg: '登录信息已失效'})
             } else {
@@ -32,7 +32,7 @@ router.get('/userInfo',  (req, res) => {
                                     if (err) {
                                         myError(res, err)
                                     }
-                                    mySend(res, {data: {...msg[0]._doc, artical_num: count}, msg: '获取成功'})
+                                    mySend(res, {data: {...msg[0]._doc, article_num: count}, msg: '获取成功'})
                                 })
                             } else {
                                 mySend(res, {msg: '该用户不存在', code: 200})
@@ -41,7 +41,6 @@ router.get('/userInfo',  (req, res) => {
                     })
                 } else {
                     mySend(res, {msg: '登录信息已失效'})
-                    return
                 }
             }
         })
@@ -54,7 +53,7 @@ router.get('/userInfo',  (req, res) => {
 router.post('/login',   (req, res) => {
     const params = req.app.get('params')
     userModel.find({
-        emil: params.emil
+        email: params.email
     }, (err, msg) => {
         if (err) {
             myError(res, err)
@@ -78,11 +77,11 @@ router.post('/login',   (req, res) => {
 // 编辑用户信息
 router.post('/editUserInfo',  (req, res) => {
     // const params = app.get('params')
-    const {name, emil, sex, label, tips, _id} = req.app.get('params')
+    const {name, email, sex, label, tips, _id} = req.app.get('params')
     userModel.updateOne({_id}, {
         '$set': {
             'name': name,
-            'emil': emil,
+            'email': email,
             'sex': sex,
             'label': label,
             'tips': tips
@@ -99,7 +98,6 @@ router.post('/editUserInfo',  (req, res) => {
 // 注册
 router.post('/addUser',  (req, res) => {
     const host = req.app.get('host')
-
     const params = req.app.get('params')
     const findName = new Promise((resolve, reject) => {
         userModel.find({
@@ -116,9 +114,9 @@ router.post('/addUser',  (req, res) => {
             }
         })
     })
-    const findEmil = new Promise((resolve, reject) => {
+    const findemail = new Promise((resolve, reject) => {
         userModel.find({
-            emil: params.emil
+            email: params.email
         }, (err, msg) => {
             if (err) {
                 reject('未知错误')
@@ -131,12 +129,13 @@ router.post('/addUser',  (req, res) => {
             }
         })
     })
-    Promise.all([findName, findEmil]).then(() => {
+    Promise.all([findName, findemail]).then(() => {
         userModel.create({
             name: params.name,
-            emil: params.emil,
+            email: params.email,
             password: params.password,
-            avatar: host + 'no-avatar-' + Math.ceil(Math.random() * 10) + '.png'
+            avatar: host + 'no-avatar-' + Math.ceil(Math.random() * 10) + '.png',
+            date: new Date().getTime()
         }, err => {
             if (err) {
                 myError(res, err)

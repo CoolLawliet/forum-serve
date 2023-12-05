@@ -16,13 +16,15 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
 const notNeedLoginPath =
-    ['/api/users/login',
+    [
+        '/api/users/login',
         '/api/users/addUser',
-        '/api/users/userInfo',
+        // '/api/users/userInfo',
         '/api/article',
         '/api/article/sort',
         '/api/article/detail',
         '/api/article/typeNum',
+        '/api/upload/uploadToken',
         '/admin/users/addUser',
         '/admin/users/editUser',
         '/admin/users/allUsers',
@@ -72,13 +74,13 @@ app.set('secret', 'jddlt')
 app.set('_id', '')
 app.set('params', '')
 app.set('userInfo', {})
-app.set('host', 'http://q739pxgpt.bkt.clouddn.com/')
+app.set('host', 'http://qiniuyun.liandss.com/')
 
-//设置允许跨域访问该服务.  //wocao 放前面 md
+//设置允许跨域访问该服务.
 app.all('*', async (req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     //Access-Control-Allow-Headers ,可根据浏览器的F12查看,把对应的粘贴在这里就行
-    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,token');
     res.header('Access-Control-Allow-Methods', '*');
     res.header('Content-Type', 'application/json;charset=utf-8');
     next();
@@ -96,8 +98,8 @@ app.use(async function (req, res, next) {
         // if (req.method == 'POST') { app.set('params', params) }
         next();
     } else {
-        if (params.token) {
-            jwt.verify(params.token, app.get('secret'), (err, decode) => {
+        if (req.headers.token) {
+            jwt.verify(req.headers.token, app.get('secret'), (err, decode) => {
                 if (err) {
                     mySend(res, {msg: '登录信息已失效', code: 401})
                 } else {
@@ -118,7 +120,7 @@ app.use(async function (req, res, next) {
             })
         } else {
             mySend(res, {msg: '未登录', code: 401})
-        }0
+        }
     }
 });
 

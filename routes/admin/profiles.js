@@ -25,7 +25,7 @@ router.post('/addType',
     (req, res) => {
         const params = req.app.get('params');
         const type = params.type
-        new Type({type}).save().then(types=>{
+        new Type({type}).save().then(types => {
             res.json({
                 state: 'suc',
                 msg: '添加成功',
@@ -50,8 +50,7 @@ router.post('/editType',
             }
             mySend(res, {msg: '修改成功'})
         })
-    }
-)
+    })
 //删除类型
 router.post('/delType',
     passport.authenticate('jwt', {session: false}),
